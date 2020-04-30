@@ -1,0 +1,88 @@
+##Illustration of Denton’s Temporal Disaggregation Methods with the Application of Annual GDP of Bangladesh for Quarterly Benchmarking and therefore Forecasting
+Abstract
+In this paper different method of temporal Disaggregation is discussed in details mainly Denton’s methods is developed by Denton in 1971 and others which are basically purely mathematical methods. In the beginning, the original method which is developed by Denton and its solution are described from the original article of Denton. Annual export of Bangladesh is disaggregated into quarterly series by the methods of Denton’s additive and proportional (first and second difference), and Denton-Cholette additive and proportional (first and second difference) methods considering quarterly imports of capital goods & others as the indicator series for the fiscal year FY2009 to fiscal year FY2019. By comparing the estimated series with the real quarterly export with the aid of root-mean-squared errors (RMSEs), it is come to an end that the Denton-Cholette additive method (the first difference) performs better than the methods which are considered.  
+
+#3. Results and analyses: Disaggregated the Export of Bangladesh as a real world example
+Bangladesh Bank, which is the central bank of Bangladesh along with Bangladesh Export Promotion Bureau updated the export data every month, and then compiled it to quarterly and yearly basis. The estimation of disaggregated quarterly series is carried out using the entire data span of yearly export from the fiscal year 2009 to second quarter of fiscal year 2019 by using Denton’s additive and proportional (first and second difference), and Denton-Cholette additive and proportional (first and second difference) methods aiding with the indicator series. 
+It has to be mentioned that actual quarterly export of Bangladesh is already available in the estimation period and thus will be helpful to compare the resulted disaggregated series. Data of two quarters of the fiscal year 2019 are chosen to extrapolate the export for two quarters by the above temporal disaggregation methods. The study will assess the disaggregation quality and as well as forecasting ability of two methods from different points of view. It has to be acknowledged that fiscal year In Bangladesh is started from 1 July and ended on 30 June of the next year. Thus the estimation period of fiscal 2009 to second quarter of fiscal year 2019 will actually be covered data form 1 July 2008 to 31 December 2018. 
+Quarterly imports of capital goods & others (In million USD) will be treated as the indicator series. The reason that the import of these items are mainly used for production purposes and the surplus production is exported after mitigating domestic demand and thus closely related with the export. Imports of capital goods & others included the items: i. Capital machinery, iii. Others capital goods, and iii. Iron, steel & other base metals. It is noted that iron, steel & other base metals were under the category of capital goods & others up to the fiscal year 2015 but form the fiscal year 2016 steel & other base metals are included to the category of consumer & intermediate goods. To keep the consistency of the data, steel & other base metals are also added with capital goods & others form the fiscal year 2016 and onward in this analysis. 
+For the temporal disaggregation of quarterly data the R package “tempdisagg”( Sax and Steiner  2013) for temporal disaggregation of time series has been used. The other popular package for temporal disaggregation is ECOTRIM. The ECOTRIM is developed by the European Commission (Barcellan 2002) and it supplies a set of mathematical and statistical techniques to carry out the temporal disaggregation of time series. The ECOTRIM deriving disaggregated time series, when aggregated data (that is lower-frequency data are available) as well as indicator series is available. By ECOTRIM still now, it is not possible to use Denton’s method to disaggregate the time series data (Sax and Steiner 2013), although this package can easily be used to disaggregate time series data for other methods (e.g., Chow-Lin, Fernandez). The R package “tempdisagg” has overcome this limitation. The disaggregation results are discussed in detasils as follows: 
+In this paper, firstly yearly export will be disaggregated to quarterly export by Denton’s and Denton-Cholette temporal disaggregation methods with indicator series and then resulted disaggregated series will be compared with the actual series. For further analysis of the disaggregation results, the quarterly (lag of one quarter) and annual (lag of four quarters) growth rates which are known as T-1 and T-4 growth rates are calculated for the resulted series and for the actual export and indicator series as well. Finally, by calculating the root-mean-squared errors (RMSE) for the growth rates for different models, the best model will be suggested for disaggregation and in addition to forecasting for short term periods.
+
+#Rcode
+R commends for the Paper on Temporal Disaggregation
+# Paper on temporal Disaggregation
+# Settiing working Directory
+setwd("E:/publication/Paper3(2019)Denton n CL compare for BD/new-Paper(2019)/paper-3/analysis")
+# Install the temporal disaggregation package "tempdisagg"
+install.packages("tempdisagg")
+# upload the temporal disaggregation package "tempdisagg" from the library to work space
+library(tempdisagg)
+#convert the xl data as CSV file
+#assign the data to Workspace that is read the csv file form working directory as dt
+dt<-read.csv("R-TD-data-paper-3-td.csv")
+#convert the variable of td as time series data(one by one)
+#For yearly export.a as time seriesdata as texport.a
+texport.a<-ts(dt$export.a, frequency =1, start = 2009, end = 2018)
+#For quarterly export.q as time series data as texport.q
+texport.q<-ts(dt$export.q, frequency =4, start = c(2009,1), end = c(2018,4))
+#For quarterly indicator.q as time series data as tindicator.q (2019Q1and 2019q2 for exprapolation) )
+tindicator.q<-ts(dt$indicator.q, frequency =4, start = c(2009,1), end = c(2019,2))
+#temporal disaggegation by Denton additive 1st difference yearly to quarterly with indicator
+da1<-td(texport.a~0+tindicator.q,to="quarterly",method="denton",criterion="additive",h=1)
+#get quarterly disaggregated results by Denton additive 1st difference
+pda1<-predict(da1)
+# convert quarterly disaggregated results as Excel (csv).s and save as excel "td.da1.csv in working directory
+write.csv(pda1,file="td.da1.csv", row.names=F)
+#temporal disaggegation by Denton additive 2nd difference yearly to quarterly with indicator
+da2<-td(texport.a~0+tindicator.q,to="quarterly",method="denton",criterion="additive",h=2)
+#get quarterly disaggregated results by Denton additive 2nd difference
+pda2<-predict(da2)
+# convert quarterly disaggregated results as Excel (csv).s and save as excel "td.da2.csv in working directory
+write.csv(pda2,file="td.da2.csv", row.names=F)
+#temporal disaggegation by Denton proportional 1st difference yearly to quarterly with indicator
+dp1<-td(texport.a~0+tindicator.q,to="quarterly",method="denton",criterion="proportional",h=1)
+#get quarterly disaggregated results by Denton additive 1st difference
+pdp1<-predict(dp1)
+# convert quarterly disaggregated results as Excel (csv).s and save as excel "td.dp1.csv in working directory
+write.csv(pdp1,file="td.dp1.csv", row.names=F)
+#temporal disaggegation by Denton proportional 2nd difference yearly to quarterly with indicator
+dp2<-td(texport.a~0+tindicator.q,to="quarterly",method="denton",criterion="proportional",h=2)
+#get quarterly disaggregated results by Denton additive 1st difference
+pdp2<-predict(dp2)
+# convert quarterly disaggregated results as Excel (csv).s and save as excel "td.dp2.csv in working directory
+write.csv(pdp2,file="td.dp2.csv", row.names=F)
+# combine the temporal disaggegated series by denton with the original given series
+td.dall<-cbind(texport.q,pda1, pda2,pdp1,pdp2)
+#convert combine  disaggregated denton results as Excel (csv).s and save as excel "td.dall.csv in working directory
+write.csv(td.dall,file="td.dall.csv", row.names=T)
+#Temporal disaggregation by Denton-cholette method
+#temporal disaggegation of yearly to quarterlyby Denton-cholette -additive 1st difference
+dca1<-td(texport.a~0+tindicator.q,to="quarterly",method="denton-cholette",criterion="additive",h=1)
+#get quarterly disaggregated results by Denton-cholette -additive 1st difference
+pdca1<-predict(dca1)
+# convert quarterly disaggregated results as Excel (csv).s and save as excel "td.dca1.csv in working directory
+write.csv(pdca1,file="td.dca1.csv", row.names=F)
+#temporal disaggegation of yearly to quarterlyby Denton-cholette -additive 2nd difference
+dca2<-td(texport.a~0+tindicator.q,to="quarterly",method="denton-cholette",criterion="additive",h=2)
+#get quarterly disaggregated results by Denton-cholette -additive 2nd difference
+pdca2<-predict(dca2)
+# convert quarterly disaggregated results as Excel (csv).s and save as excel "td.dca2.csv in working directory
+write.csv(pdca2,file="td.dca2.csv", row.names=F)
+#temporal disaggegation of yearly to quarterly by Denton-cholette-proportional 1st difference
+dcp1<-td(texport.a~0+tindicator.q,to="quarterly",method="denton-cholette",criterion="proportional",h=1)
+#get quarterly disaggregated results by Denton-cholette -proportional 1st difference
+pdcp1<-predict(dcp1)
+# convert quarterly disaggregated results as Excel (csv).s and save as excel "td.dcp1.csv in working directory
+write.csv(pdcp1,file="td.dcp1.csv", row.names=F)
+#temporal disaggegation of yearly to quarterly by Denton-cholette-proportional 2nd difference
+dcp2<-td(texport.a~0+tindicator.q,to="quarterly",method="denton-cholette",criterion="proportional",h=2)
+#get quarterly disaggregated results by Denton-cholette -proportional 2nd difference
+pdcp2<-predict(dcp2)
+# convert quarterly disaggregated results as Excel (csv).s and save as excel "td.dcp2.csv in working directory
+write.csv(pdcp2,file="td.dcp2.csv", row.names=F)
+# combine the temporal disaggegated series by denton-cholwtte with the original given series
+td.dcall<-cbind(texport.q,pdca1, pdca2,pdcp1,pdcp2)
+#convert combine  disaggregated denton-cholette results as Excel (csv).s and save as excel "td.dcall.csv in working directory
+write.csv(td.dcall,file="td.dcall.csv", row.names=T)
+
